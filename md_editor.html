@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Markdown Editor</title>
+<script src="https://unpkg.com/vue@next"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+    #app {
+        display: flex;
+        justify-content: space-between;
+    }
+    textarea, #preview {
+        width: 48%;
+        height: 90vh;
+        padding: 10px;
+    }
+    textarea {
+        font-size: 16px;
+    }
+</style>
+</head>
+<body>
+<div id="app">
+    <textarea v-model="input"></textarea>
+    <div id="preview" v-html="compiledMarkdown"></div>
+</div>
+
+<script>
+Vue.createApp({
+    data() {
+        return {
+            input: ''
+        }
+    },
+    computed: {
+        compiledMarkdown() {
+            return marked(this.input);
+        }
+    }
+}).mount('#app');
+</script>
+</body>
+</html>
