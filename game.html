@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>アクションゲーム</title>
+<style>
+    body { margin: 0; overflow: hidden; }
+    #gameCanvas { background: #000; display: block; margin: 0 auto; }
+    .gameOver {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #FF0000;
+        font-size: 48px;
+        font-family: Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+<div class="gameOver" style="display: none;">ゲームオーバー</div>
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const gameOverText = document.querySelector('.gameOver');
+
+    let player = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        width: 50,
+        height: 50,
+        speed: 10,
+        color: '#00FF00'
+    };
+
+    let enemy = {
+        x: 100,
+        y: 100,
+        width: 50,
+        height: 50,
+        speed: 2,
+        color: '#FF0000'
+    };
+
+    let gameRunning = true;
+
+    // プレイヤーと敵の描画
+    // プレイヤーの描画
+    function drawPlayer() {
+        ctx.fillStyle = player.color;
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    // 敵の描画
+    function drawEnemy() {
+        ctx.fillStyle = enemy.color;
+        ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+    }
+
+    // キャンバスをクリア
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+
+    // ゲームの更新
+    function updateGame() {
+        if (!gameRunning) return;
+        clearCanvas();
+        drawPlayer();
+        drawEnemy();
+        moveEnemy();
+        checkCollision();
+        requestAnimationFrame(updateGame);
+    }
+
+    // プレイヤーの移動
+    function movePlayer(event) {
+        if (!gameRunning) return;
+        switch (event.key) {
+            case 'ArrowUp': player.y -= player.speed; break;
+            case 'ArrowDown': player.y += player.speed; break;
+            case 'ArrowLeft': player.x -= player.speed; break;
+            case 'ArrowRight': player.x += player.speed; break;
+        }
+    }
+
+    // 敵の移動
+    function moveEnemy() {
+        let dx = player.x - enemy.x;
+        let dy = player.y - enemy.y;
+        let angle = Math.atan2(dy, dx);
+        enemy.x += enemy.speed * Math.cos(angle);
+        enemy.y += enemy.speed * Math.sin(angle);
+    }
+
+    // 衝突判定
+    function checkCollision() {
+        if (player.x < enemy.x + enemy.width &&
+            player.x + player.width > enemy.x &&
+            player.y < enemy.y + enemy.height &&
+            player.y + player.height > enemy.y) {
+            gameOver();
+        }
+    }
+
+    function gameOver() {
+        gameRunning = false;
+        gameOverText.style.display = 'block';
+        document.removeEventListener('keydown', movePlayer);
+    }
+
+    document.addEventListener('keydown', movePlayer);
+
+    updateGame();
+</script>
+</body>
+</html>
